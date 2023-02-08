@@ -1,8 +1,8 @@
-#init counter
-counter = 0
+#init counter w timestate in case of manipulations across threads
+set :counter, 0
 
-#init chord prog
-chord_prog = [
+#init chord prog w timestate in case of manipulations across threads
+set :chord_prog, [
   chord(:C4, :maj9),
   chord(:D4, :m9),
   chord(:E4, :m9),
@@ -14,7 +14,7 @@ chord_prog = [
 
 
 # shuffle chord options to start
-chord_prog.shuffle
+get[:chord_prog].shuffle
 
 # creating a thread for cueing
 in_thread(name: :metronome) do
@@ -31,7 +31,7 @@ in_thread(name: :counter) do
     sync :tick
     
     # on each tick, increment the counter
-    counter = (inc counter)
+    set :counter, (inc get[:counter])
   end
 end
 
@@ -41,13 +41,13 @@ in_thread(name: :pulse_chords) do
     sync :tick
     
     # if the counter mod 4 is 0, then shuffle chord options order
-    if counter % 4 == 0
-      chord_prog = chord_prog.shuffle
+    if get[:counter] % 4 == 0
+      set :chord_prog, get[:chord_prog].shuffle
     end
     
     # play chords at counter position using pulse synth
     use_synth :pulse
-    play_chord chord_prog[counter]
+    play_chord get[:chord_prog][get[:counter]]
   end
 end
 
