@@ -5,7 +5,8 @@ const Firmata = require("firmata");
 const Osc = require("osc");
 
 // initialize reference to arduino board
-const board = new Firmata("/dev/cu.usbmodem101");
+// referencing right side usbc port
+const board = new Firmata("/dev/cu.usbmodem2101");
  
  // initialization of osc protocol
  const udpPort = new Osc.UDPPort({
@@ -31,7 +32,8 @@ const board = new Firmata("/dev/cu.usbmodem101");
 	   
 	     // activate 4th pin as digital input for touchpad
 	     board.pinMode(4, board.MODES.INPUT);
-	   
+		
+		 // TOUCHPAD 1
 	     //receive input from fourth pin and store
 	     board.digitalRead(4, function (readResult) {
 		   
