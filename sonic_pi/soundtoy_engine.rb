@@ -1,3 +1,6 @@
+# setting a random seed
+use_random_seed 1020
+
 #init counter w timestate in case of manipulations across threads
 set :counter, 0
 
@@ -12,42 +15,23 @@ set :chord_prog, [
   chord(:B4, :dim7)
 ].ring
 
-
 # shuffle chord options to start
 get[:chord_prog].shuffle
 
-# creating a thread for cueing
-in_thread(name: :metronome) do
-  loop do
-    # create a metronome tick every 2 bars
-    cue :tick
-    sleep 1.5
+live_loop :touchpad_1 do
+  # initialize ability to receive osc
+  use_real_time
+  
+  # if the counter mod 4 is 0, then shuffle chord options order
+  if get[:counter] % 4 == 0
+    set :chord_prog, get[:chord_prog].shuffle
   end
+  
+  # sync in the osc message
+  sync "/osc:127.0.0.1:57121/touchpad/1"
+  # play chords at counter position using pulse synth
+  use_synth :pulse
+  play_chord get[:chord_prog][get[:counter]]
+  # increment counter by 1
+  set :counter, (inc get[:counter])
 end
-
-in_thread(name: :counter) do
-  loop do
-    # sync with metronome tick
-    sync :tick
-    
-    # on each tick, increment the counter
-    set :counter, (inc get[:counter])
-  end
-end
-
-in_thread(name: :pulse_chords) do
-  loop do
-    # sync with metronome tick
-    sync :tick
-    
-    # if the counter mod 4 is 0, then shuffle chord options order
-    if get[:counter] % 4 == 0
-      set :chord_prog, get[:chord_prog].shuffle
-    end
-    
-    # play chords at counter position using pulse synth
-    use_synth :pulse
-    play_chord get[:chord_prog][get[:counter]]
-  end
-end
-

@@ -41,7 +41,7 @@ const board = new Firmata("/dev/cu.usbmodem101");
 			 console.log(`${readResult}`);
 			 // send osc message
 			 udpPort.send({
-				  address: "/test_message",
+				  address: "/touchpad/1",
 				  args: []
 			  }, "127.0.0.1", 4560);
 			  
