@@ -7,48 +7,70 @@ const Osc = require("osc");
 // initialize reference to arduino board
 // referencing right side usbc port
 const board = new Firmata("/dev/cu.usbmodem2101");
- 
- // initialization of osc protocol
- const udpPort = new Osc.UDPPort({
-	 localAddress: "0.0.0.0",
-	 localPort: 57121,
-	 metadata: true
- });
- 
- // opening port post initialization
- udpPort.open();
- 
- // after port has been opened
- udpPort.on("ready", function () {
-	 
-	 // report that port has been opened
-	 console.log("port opened")
-	 
-	 // connect to board
-	 board.on("ready", () => {
-		 
-	     // Arduino is ready to communicate
-	     console.log("connected to board");
-	   
-	     // activate 4th pin as digital input for touchpad
-	     board.pinMode(4, board.MODES.INPUT);
-		
-		 // TOUCHPAD 1
-	     //receive input from fourth pin and store
-	     board.digitalRead(4, function (readResult) {
-		   
-		   // checking if input is true(1)
-		   if(readResult) {
-			 // console log for testing
-			 console.log(`${readResult}`);
-			 // send osc message
-			 udpPort.send({
-				  address: "/touchpad/1",
-				  args: []
-			  }, "127.0.0.1", 4560);
-			  
-			  console.log("sent message");
-		   }
-	   });
-	});
+
+// initialization of osc protocol
+const udpPort = new Osc.UDPPort({
+  localAddress: "0.0.0.0",
+  localPort: 57121,
+  metadata: true,
+});
+
+// opening port post initialization
+udpPort.open();
+
+// after port has been opened
+udpPort.on("ready", function () {
+  // report that port has been opened
+  console.log("port opened");
+
+  // connect to board
+  board.on("ready", () => {
+    // Arduino is ready to communicate
+    console.log("connected to board");
+
+    // activate 2nd pin as digital input for touchpad 1
+    board.pinMode(2, board.MODES.INPUT);
+    // activate 3rd pin as digital input for touchpad 2
+    board.pinMode(3, board.MODES.INPUT);
+
+    // TOUCHPAD 1
+    //receive input from 2nd pin and pass on
+    board.digitalRead(2, function (readResult) {
+      // checking if input is true(1)
+      if (readResult) {
+        // console log for testing
+        // console.log(`${readResult}`);
+        // send osc message
+        udpPort.send(
+          {
+            address: "/touchpad/1",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
+
+        console.log("sent /touchpad/1");
+      }
+    });
+
+    // TOUCHPAD 2
+    // receive input from 3rd pin and pass on
+    board.digitalRead(3, function (readResult) {
+      // checking if input is true(1)
+      if (readResult) {
+        //send different osc message
+        udpPort.send(
+          {
+            address: "/touchpad/2",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
+
+        console.log("sent /touchpad/2");
+      }
+    });
   });
+});

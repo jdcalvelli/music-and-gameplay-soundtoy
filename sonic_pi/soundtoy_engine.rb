@@ -1,9 +1,6 @@
 # setting a random seed
 use_random_seed 1020
 
-#init counter w timestate in case of manipulations across threads
-set :counter, 0
-
 #init chord prog w timestate in case of manipulations across threads
 set :chord_prog, [
   chord(:C4, :maj9),
@@ -18,20 +15,30 @@ set :chord_prog, [
 # shuffle chord options to start
 get[:chord_prog].shuffle
 
+#set sub arrays the stupid way
+set :sub_arr_1, [get[:chord_prog][0], get[:chord_prog][1]]
+set :sub_arr_2, [get[:chord_prog][2], get[:chord_prog][3]]
+
 live_loop :touchpad_1 do
   # initialize ability to receive osc
   use_real_time
-  
-  # if the counter mod 4 is 0, then shuffle chord options order
-  if get[:counter] % 4 == 0
-    set :chord_prog, get[:chord_prog].shuffle
-  end
   
   # sync in the osc message
   sync "/osc:127.0.0.1:57121/touchpad/1"
   # play chords at counter position using pulse synth
   use_synth :pulse
-  play_chord get[:chord_prog][get[:counter]]
-  # increment counter by 1
-  set :counter, (inc get[:counter])
+  play_chord choose(get[:sub_arr_1])
+  
 end
+
+live_loop :touchpad_2 do
+  # initialize ability to receive osc
+  use_real_time
+  
+  # sync in the osc message
+  sync "/osc:127.0.0.1:57121/touchpad/2"
+  use_synth :pulse
+  play_chord choose(get[:sub_arr_2])
+  
+end
+
