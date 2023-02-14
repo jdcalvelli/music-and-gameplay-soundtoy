@@ -32,14 +32,16 @@ udpPort.on("ready", function () {
     board.pinMode(2, board.MODES.INPUT);
     // activate 3rd pin as digital input for touchpad 2
     board.pinMode(3, board.MODES.INPUT);
+    // activate 4th pin as digital input for touchpad 3
+    board.pinMode(4, board.MODES.INPUT);
+    // activate 5th pin as digital input for touchpad 4
+    board.pinMode(5, board.MODES.INPUT);
 
     // TOUCHPAD 1
     //receive input from 2nd pin and pass on
     board.digitalRead(2, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
-        // console log for testing
-        // console.log(`${readResult}`);
         // send osc message
         udpPort.send(
           {
@@ -59,7 +61,7 @@ udpPort.on("ready", function () {
     board.digitalRead(3, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
-        //send different osc message
+        // send osc message
         udpPort.send(
           {
             address: "/touchpad/2",
@@ -70,6 +72,42 @@ udpPort.on("ready", function () {
         );
 
         console.log("sent /touchpad/2");
+      }
+    });
+
+    // TOUCHPAD 3
+    // receive input from 4th pin and pass on
+    board.digitalRead(4, function (readResult) {
+      // checking if input is true(1)
+      if (readResult) {
+        // send osc message
+        udpPort.send(
+          {
+            address: "/touchpad/3",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
+
+        console.log("sent /touchpad/3");
+      }
+    });
+
+    // TOUCHPAD 4
+    // receive input from 5th pin and pass on
+    board.digitalRead(5, function (readResult) {
+      // checking if input is true(1)
+      if (readResult) {
+        // send osc message
+        udpPort.send(
+          {
+            address: "/touchpad/4",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
       }
     });
   });
