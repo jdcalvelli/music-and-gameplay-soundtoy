@@ -36,6 +36,8 @@ udpPort.on("ready", function () {
     board.pinMode(4, board.MODES.INPUT);
     // activate 5th pin as digital input for touchpad 4
     board.pinMode(5, board.MODES.INPUT);
+    // activate 13th pin as pullup input for seq button
+    board.pinMode(13, board.MODES.PULLUP);
 
     // TOUCHPAD 1
     //receive input from 2nd pin and pass on
@@ -108,6 +110,26 @@ udpPort.on("ready", function () {
           "127.0.0.1",
           4560
         );
+
+        console.log("sent /touchpad/4");
+      }
+    });
+
+    // SEQ BUTTON
+    board.digitalRead(13, function (readResult) {
+      // if read result is 0 send osc
+      if (!readResult) {
+        // send osc message
+        udpPort.send(
+          {
+            address: "/button/1",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
+
+        console.log("sent button press");
       }
     });
   });
