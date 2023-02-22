@@ -35,11 +35,18 @@ set :seq, [
   :rest,
   :rest
 ].ring
+
 # init sequencer power state to off
 set :power_seq, false
 
+# init instrument options ring state
+set :instrument_ops, [:chords, :drums, :bass].ring
+
+# init current instrument state
+set :current_instrument, get[:instrument_ops][0]
+
 #####
-# CHORDS SECTION
+# INSTRUMENT PLAYBACK SECTION
 #####
 
 live_loop :touchpad_1 do
@@ -49,13 +56,21 @@ live_loop :touchpad_1 do
   # sync in the osc message
   sync "/osc:127.0.0.1:57121/touchpad/1"
   
-  # set chord to be played and saved in sequencer
-  chd = choose(get[:sub_arr_1])
-  # play chord
-  use_synth :pulse
-  play_chord chd
-  # save chord to seq
-  update_seq chd
+  # change instrument based on current instrument
+  case get[:current_instrument]
+  when :chords
+    # set chord to be played and saved in sequencer
+    chd = choose(get[:sub_arr_1])
+    # play chord
+    use_synth :pulse
+    play_chord chd
+    # save chord to seq
+    update_seq chd
+  when :drums
+    print "drums go here"
+  when :bass
+    print "bass goes here"
+  end
   
 end
 
@@ -65,10 +80,22 @@ live_loop :touchpad_2 do
   
   # sync in the osc message
   sync "/osc:127.0.0.1:57121/touchpad/2"
-  chd = choose(get[:sub_arr_2])
-  use_synth :pulse
-  play_chord chd
-  update_seq chd
+  
+  # change instrument based on current instrument
+  case get[:current_instrument]
+  when :chords
+    # set chord to be played and saved in sequencer
+    chd = choose(get[:sub_arr_2])
+    # play chord
+    use_synth :pulse
+    play_chord chd
+    # save chord to seq
+    update_seq chd
+  when :drums
+    print "drums go here"
+  when :bass
+    print "bass goes here"
+  end
   
 end
 
@@ -78,10 +105,22 @@ live_loop :touchpad_3 do
   
   # sync in the osc message
   sync "/osc:127.0.0.1:57121/touchpad/3"
-  chd = choose(get[:sub_arr_3])
-  use_synth :pulse
-  play_chord chd
-  update_seq chd
+  
+  # change instrument based on current instrument
+  case get[:current_instrument]
+  when :chords
+    # set chord to be played and saved in sequencer
+    chd = choose(get[:sub_arr_3])
+    # play chord
+    use_synth :pulse
+    play_chord chd
+    # save chord to seq
+    update_seq chd
+  when :drums
+    print "drums go here"
+  when :bass
+    print "bass goes here"
+  end
   
 end
 
@@ -91,10 +130,22 @@ live_loop :touchpad_4 do
   
   # sync in the osc message
   sync "/osc:127.0.0.1:57121/touchpad/4"
-  chd = choose(get[:sub_arr_4])
-  use_synth :pulse
-  play_chord chd
-  update_seq chd
+  
+  # change instrument based on current instrument
+  case get[:current_instrument]
+  when :chords
+    # set chord to be played and saved in sequencer
+    chd = choose(get[:sub_arr_1])
+    # play chord
+    use_synth :pulse
+    play_chord chd
+    # save chord to seq
+    update_seq chd
+  when :drums
+    print "drums go here"
+  when :bass
+    print "bass goes here"
+  end
   
 end
 
@@ -126,6 +177,28 @@ live_loop :run_seq do
   else
     sleep 1
   end
+end
+
+#####
+# INSTRUMENT SWITCHER SECTION
+#####
+
+live_loop :switch_instrument do
+  # initialize ability to receive osc
+  use_real_time
+  
+  # sync in the osc message
+  sync "/osc:127.0.0.1:57121/touchcap/1"
+  # this is a bad way of doing this but good enough for now
+  case get[:current_instrument]
+  when :chords
+    set :current_instrument, get[:instrument_ops][1]
+  when :drums
+    set :current_instrument, get[:instrument_ops][2]
+  when :bass
+    set :current_instrument, get[:instrument_ops][0]
+  end
+  
 end
 
 #####
