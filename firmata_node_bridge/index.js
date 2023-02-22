@@ -28,20 +28,22 @@ udpPort.on("ready", function () {
     // Arduino is ready to communicate
     console.log("connected to board");
 
-    // activate 2nd pin as digital input for touchpad 1
+    // activate 2nd pin as digital input for touchpad 4
     board.pinMode(2, board.MODES.INPUT);
-    // activate 3rd pin as digital input for touchpad 2
+    // activate 3rd pin as digital input for touchpad 3
     board.pinMode(3, board.MODES.INPUT);
-    // activate 4th pin as digital input for touchpad 3
+    // activate 4th pin as digital input for touchpad 2
     board.pinMode(4, board.MODES.INPUT);
-    // activate 5th pin as digital input for touchpad 4
+    // activate 5th pin as digital input for touchpad 1
     board.pinMode(5, board.MODES.INPUT);
     // activate 13th pin as pullup input for seq button
     board.pinMode(13, board.MODES.PULLUP);
+    // activate 1th pin as digital input for touch sensor
+    board.pinMode(10, board.MODES.INPUT);
 
     // TOUCHPAD 1
-    //receive input from 2nd pin and pass on
-    board.digitalRead(2, function (readResult) {
+    //receive input from 5th pin and pass on
+    board.digitalRead(5, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
         // send osc message
@@ -59,8 +61,8 @@ udpPort.on("ready", function () {
     });
 
     // TOUCHPAD 2
-    // receive input from 3rd pin and pass on
-    board.digitalRead(3, function (readResult) {
+    // receive input from 4th pin and pass on
+    board.digitalRead(4, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
         // send osc message
@@ -78,8 +80,8 @@ udpPort.on("ready", function () {
     });
 
     // TOUCHPAD 3
-    // receive input from 4th pin and pass on
-    board.digitalRead(4, function (readResult) {
+    // receive input from 3rd pin and pass on
+    board.digitalRead(3, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
         // send osc message
@@ -97,8 +99,8 @@ udpPort.on("ready", function () {
     });
 
     // TOUCHPAD 4
-    // receive input from 5th pin and pass on
-    board.digitalRead(5, function (readResult) {
+    // receive input from 2nd pin and pass on
+    board.digitalRead(2, function (readResult) {
       // checking if input is true(1)
       if (readResult) {
         // send osc message
@@ -130,6 +132,22 @@ udpPort.on("ready", function () {
         );
 
         console.log("sent button press");
+      }
+    });
+
+    board.digitalRead(10, function (readResult) {
+      if (readResult) {
+        // send osc message
+        udpPort.send(
+          {
+            address: "/touchcap/1",
+            args: [],
+          },
+          "127.0.0.1",
+          4560
+        );
+
+        console.log("touch cap sent");
       }
     });
   });
