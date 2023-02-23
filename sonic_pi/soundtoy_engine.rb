@@ -50,6 +50,7 @@ set :current_instrument, get[:instrument_ops][0]
 #####
 
 live_loop :touchpad_1 do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -66,8 +67,19 @@ live_loop :touchpad_1 do
     play_chord chd
     # save chord to seq
     update_seq chd
+    
   when :drums
-    print "drums go here"
+    # play a kick drum
+    # synthesized from gnoise
+    use_synth :gnoise
+    with_fx :nlpf, cutoff: 40 do
+      with_fx :hpf, cutoff: 30 do
+        with_fx :compressor do
+          play 40, attack: 0, decay: 0.01, sustain: 0, release: 0
+        end
+      end
+    end
+    
   when :bass
     print "bass goes here"
   end
@@ -75,6 +87,7 @@ live_loop :touchpad_1 do
 end
 
 live_loop :touchpad_2 do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -92,7 +105,14 @@ live_loop :touchpad_2 do
     # save chord to seq
     update_seq chd
   when :drums
-    print "drums go here"
+    # play a hi hat
+    # synthesized from pnoise
+    use_synth :cnoise
+    with_fx :lpf, cutoff: 100 do
+      with_fx :hpf, cutoff: 95 do
+        play 120, attack: 0, decay: 0.02, sustain: 0, release: 0.01
+      end
+    end
   when :bass
     print "bass goes here"
   end
@@ -100,6 +120,7 @@ live_loop :touchpad_2 do
 end
 
 live_loop :touchpad_3 do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -116,15 +137,26 @@ live_loop :touchpad_3 do
     play_chord chd
     # save chord to seq
     update_seq chd
+    
   when :drums
-    print "drums go here"
+    # play a snare
+    # synthesized from noise
+    use_synth :noise
+    with_fx :rhpf, cutoff: 80 do
+      with_fx :rlpf, cutoff: 95 do
+        play 60, attack: 0, decay: 0.1, sustain: 0, release: 0.1
+      end
+    end
+    
   when :bass
     print "bass goes here"
+    
   end
   
 end
 
 live_loop :touchpad_4 do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -141,10 +173,19 @@ live_loop :touchpad_4 do
     play_chord chd
     # save chord to seq
     update_seq chd
+    
   when :drums
-    print "drums go here"
+    # crash cymbal
+    use_synth :cnoise
+    with_fx :hpf, cutoff: 100 do
+      with_fx :lpf, cutoff: 115 do
+        play 120, attack: 0.01, decay: 0.3, sustain: 0, release: 0.6
+      end
+    end
+    
   when :bass
     print "bass goes here"
+    
   end
   
 end
@@ -155,6 +196,7 @@ end
 
 # sequencer activation loop
 live_loop :sequencer_on do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -177,6 +219,7 @@ live_loop :run_seq do
   else
     sleep 1
   end
+  
 end
 
 #####
@@ -184,6 +227,7 @@ end
 #####
 
 live_loop :switch_instrument do
+  
   # initialize ability to receive osc
   use_real_time
   
@@ -206,10 +250,12 @@ end
 #####
 
 define :update_seq do |chord_to_add|
+  
   # set new_seq equal to seq in state, remove first element
   new_seq = get[:seq].drop(1)
   # update new_seq to add chord played
   new_seq = new_seq.to_a.push chord_to_add
   # update seq in state to be a ring version of new sequence
   set :seq, new_seq.ring
+  
 end
